@@ -546,6 +546,15 @@ class InvokeStudentFunctionTest(Test):
             short_desc = "Test: %s(%s)" % (fn_name, ", ".join(repr(a) for a in args))
         Test.__init__(self, test_fn, short_desc, detailed_desc, compare)
 
+class ExecWrappedStudentCodeTest(Test):
+    """
+    A Test that exec student code and capture the stdout result.
+    The code must be preprocessed with `wrap_in_string`
+    """
+    def __init__(self, environment={}, short_desc="", detailed_desc="", compare=None):
+        test_fn = exec_wrapped_code(environment)
+        Test.__init__(self, test_fn, short_desc, detailed_desc, compare)
+
 def round_float_writer(n):
     """
     Returns an output_writer function that rounds its argument to `n` places.

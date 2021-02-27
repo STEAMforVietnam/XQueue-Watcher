@@ -116,9 +116,13 @@ class Grader(object):
             files = content['xqueue_files']
 
             # Delivery from the lms
+            print("____ DEBUG ____")
+            print(body)
             body = json.loads(body)
             student_response = body['student_response']
             payload = body['grader_payload']
+            print(student_response)
+            print(payload)
             try:
                 grader_config = json.loads(payload)
             except ValueError as err:
@@ -130,8 +134,12 @@ class Grader(object):
                 raise
 
             self.log.debug("Processing submission, grader payload: {0}".format(payload))
+            #relative_grader_path = 'lesson1_hw2/grader.py' # TODO actually have a grader in the config
             relative_grader_path = grader_config['grader']
             grader_path = (self.grader_root / relative_grader_path).abspath()
+            print("___ DEBUG ___")
+            print("Grader path", grader_path)
+            print("Relative path", relative_grader_path)
             start = time.time()
             results = self.grade(grader_path, grader_config, student_response)
 

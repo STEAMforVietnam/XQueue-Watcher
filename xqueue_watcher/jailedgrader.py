@@ -78,12 +78,17 @@ class JailedGrader(Grader):
         trans.install(names=None)
 
     def _run(self, grader_path, thecode, seed):
+        print("--- RUN CODE ---", grader_path, thecode)
         files = SUPPORT_FILES + [grader_path]
         if self.locale_dir.exists():
             files.append(self.locale_dir)
         extra_files = [('submission.py', thecode.encode('utf-8'))]
         argv = ["-m", "grader_support.run", Path(grader_path).basename(), 'submission.py', seed]
+        print("argv -- ", argv)
+        print("files", files)
+        print("extra_files", extra_files)
         r = codejail.jail_code.jail_code(self.codejail_python, files=files, extra_files=extra_files, argv=argv)
+        print("result", r.status, r.stdout, r.stderr)
         return r
 
     def grade(self, grader_path, grader_config, submission):
@@ -116,7 +121,11 @@ class JailedGrader(Grader):
 
         self._enable_i18n(grader_config.get("lang", LANGUAGE))
 
+        print("__DEBUG__")
+        print("grader path", grader_path)
+
         answer_path = Path(grader_path).dirname() / 'answer.py'
+        print("answer path", answer_path)
         with open(answer_path, 'rb') as f:
             answer = f.read().decode('utf-8')
 
@@ -137,6 +146,9 @@ class JailedGrader(Grader):
         processed_answer = prepend_coding(grader.preprocess(answer))
         processed_submission = prepend_coding(grader.preprocess(submission))
 
+        print("processed answer", processed_answer)
+        print("processed_submission", processed_submission)
+
         # Same seed for both runs
         seed = str(random.randint(0, 20000))
 
@@ -148,6 +160,7 @@ class JailedGrader(Grader):
             # avoid hitting the sandbox. (change run to run_trusted)
             expected_outputs = None  # in case run_trusted raises an exception.
             expected_outputs = self._run(grader_path, processed_answer, seed).stdout
+            print("expected_outputs", expected_outputs)
             if expected_outputs:
                 expected = json.loads(expected_outputs.decode('utf-8'))
                 expected_ok = True

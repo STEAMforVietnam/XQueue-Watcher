@@ -560,9 +560,11 @@ class ExecWrappedStudentCodeTest(Test):
     A Test that exec student code and capture the stdout result.
     The code must be preprocessed with `wrap_in_string`
     """
-    def __init__(self, environment={}, short_desc="", detailed_desc="", compare=None):
+    def __init__(self, environment=None, short_desc=None, detailed_desc=None, compare=None):
         test_fn = exec_wrapped_code(environment)
-        Test.__init__(self, test_fn, short_desc, detailed_desc, compare)
+        if short_desc is None:
+            short_desc = "Test: %s(%s)" % (fn_name, ", ".join(repr(a) for a in args))
+        gradelib.Test.__init__(self, test_fn, short_desc, detailed_desc, compare)
 
 def round_float_writer(n):
     """

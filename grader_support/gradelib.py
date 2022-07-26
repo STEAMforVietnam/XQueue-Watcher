@@ -564,7 +564,7 @@ class ExecWrappedStudentCodeTest(Test):
         test_fn = exec_wrapped_code(environment)
         if short_desc is None:
             short_desc = "Test: %s(%s)" % (fn_name, ", ".join(repr(a) for a in args))
-        gradelib.Test.__init__(self, test_fn, short_desc, detailed_desc, compare)
+        Test.__init__(self, test_fn, short_desc, detailed_desc, compare)
 
 def round_float_writer(n):
     """

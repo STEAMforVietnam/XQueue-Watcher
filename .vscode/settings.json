@@ -1,0 +1,71 @@
+{
+  "editor.rulers": [79],
+
+  "files.exclude": {
+    "**/.git": true,
+    "**/.mypy_cache": true,
+    "**/__pycache__": true,
+    "**/.ropeproject": true,
+  },
+
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingImports" : "none",
+    "reportMissingModuleSource" : "none",
+    "reportUndefinedVariable" : "none",
+  },
+
+  "python.linting.enabled": true,
+
+  "python.linting.pylintEnabled": true,
+  "python.linting.pylintArgs": [
+    "--disable", "bare-except",
+    "--disable", "broad-except",
+    "--disable", "consider-using-f-string",
+    "--disable", "import-error",
+    "--disable", "import-outside-toplevel",
+    "--disable", "invalid-name",
+    "--disable", "line-too-long",
+    "--disable", "logging-format-interpolation",
+    "--disable", "method-hidden",
+    "--disable", "missing-class-docstring",
+    "--disable", "missing-function-docstring",
+    "--disable", "missing-module-docstring",
+    "--disable", "multiple-imports",
+    "--disable", "super-with-arguments",
+    "--disable", "too-few-public-methods",
+    "--disable", "too-many-arguments",
+    "--disable", "too-many-branches",
+    "--disable", "undefined-variable",
+    "--disable", "unspecified-encoding",
+    "--disable", "unused-argument",
+    "--disable", "unused-variable",
+    "--disable", "useless-object-inheritance",
+    "--disable", "wrong-import-order",
+  ],
+
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": [
+    "--ignore=E115,E116,E123,E128,E226,E231,E261,E265,E266,E302,E303,E305,E306,E401,E501,E722,E741,F401,F821,F841,N806",
+  ],
+
+  "python.linting.mypyEnabled": false,
+
+  "python.linting.pydocstyleEnabled": false,
+
+  "python.linting.pycodestyleEnabled": true,
+  "python.linting.pycodestyleArgs": [
+    "--ignore=E115,E226,E265,E266,E302,E303,E305,E306,E401,E501,E722,E741",
+  ],
+
+  "python.linting.prospectorEnabled": true,
+
+  "python.linting.pylamaEnabled": true,
+  "python.linting.pylamaArgs": [
+    "--ignore=C901,E115,E226,E265,E266,E302,E303,E305,E306,E501,E0602,E722,W0612",
+  ],
+
+  "python.linting.banditEnabled": true,
+  "python.linting.banditArgs": [
+    "--skip=B103,B108,B110,B311",
+  ]
+}

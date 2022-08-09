@@ -36,11 +36,13 @@ pylint:
     - django-not-configured
     - import-error
     - import-outside-toplevel
+    - inconsistent-return-statements
     - line-too-long
     - logging-format-interpolation
     - logging-not-lazy
     - method-hidden
     - multiple-imports
+    - no-else-raise
     - no-else-return
     - pointless-statement
     - super-with-arguments

@@ -22,3 +22,8 @@ reports/
 \#*\#
 *.egg-info
 .idea/
+
+
+# Visual Studio Code
+.vscode/
+*.code-workspace

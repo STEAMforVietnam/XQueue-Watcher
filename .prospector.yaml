@@ -15,6 +15,7 @@ pep8:
 pycodestyle:
   disable:
     - E115
+    - E116
     - E305
     - E306
     - E501
@@ -28,6 +29,7 @@ pyflakes:
 
 pylint:
   disable:
+    - arguments-renamed
     - bare-except
     - consider-using-f-string
     - deprecated-module
@@ -43,7 +45,11 @@ pylint:
     - pointless-statement
     - super-with-arguments
     - too-many-arguments
+    - too-many-branches
+    - too-many-locals
+    - too-many-statements
     - undefined-variable
+    - unidiomatic-typecheck
     - unused-argument
     - unused-import
     - unused-variable

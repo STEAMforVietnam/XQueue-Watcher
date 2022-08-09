@@ -46,6 +46,7 @@
     "--disable", "too-many-locals",
     "--disable", "too-many-statements",
     "--disable", "undefined-variable",
+    "--disable", "unidiomatic-typecheck",
     "--disable", "unspecified-encoding",
     "--disable", "unused-argument",
     "--disable", "unused-import",
@@ -65,7 +66,7 @@
 
   "python.linting.pycodestyleEnabled": true,
   "python.linting.pycodestyleArgs": [
-    "--ignore=E115,E116,E123,E128,E226,E265,E231,E266,E302,E303,E305,E306,E401,E501,E722,E741"
+    "--ignore=E115,E116,E123,E128,E226,E261,E265,E231,E266,E302,E303,E305,E306,E401,E501,E722,E741"
   ],
 
   "python.linting.prospectorEnabled": true,

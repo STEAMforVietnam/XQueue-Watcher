@@ -20,6 +20,7 @@ pycodestyle:
     - E306
     - E501
     - E722
+    - E741
 
 pyflakes:
   disable:

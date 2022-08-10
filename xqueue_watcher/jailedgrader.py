@@ -341,10 +341,10 @@ def main(args):     # pragma: no cover
     (grader_path, submission_path) = args
 
     with open(submission_path) as f:
-        submission = f.read().decode('utf-8')
+        submission = f.read()   # .decode('utf-8')
 
     grader_config = {"lang": "eo"}
-    grader_path = path(grader_path).abspath()
+    grader_path = Path(grader_path).abspath()
     g = JailedGrader(grader_root=grader_path.dirname().parent.parent)
     pprint(g.grade(grader_path, grader_config, submission))
 

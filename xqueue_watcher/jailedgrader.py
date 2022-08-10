@@ -337,7 +337,7 @@ def main(args):     # pragma: no cover
     if len(args) != 2:
         return
 
-    configure("python", sys.executable, user=getpass.getuser())
+    configure('python3', sys.executable, user=getpass.getuser())
     (grader_path, submission_path) = args
 
     with open(submission_path) as f:

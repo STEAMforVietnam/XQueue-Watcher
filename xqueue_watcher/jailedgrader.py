@@ -345,7 +345,8 @@ def main(args):     # pragma: no cover
 
     grader_config = {"lang": "eo"}
     grader_path = Path(grader_path).abspath()
-    g = JailedGrader(grader_root=grader_path.dirname().parent.parent)
+    g = JailedGrader(grader_root=grader_path.dirname().parent.parent,
+                     codejail_python='python3')
     pprint(g.grade(grader_path, grader_config, submission))
 
 

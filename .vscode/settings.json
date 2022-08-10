@@ -45,6 +45,7 @@
     "--disable", "too-many-branches",
     "--disable", "too-many-instance-attributes",
     "--disable", "too-many-locals",
+    "--disable", "too-many-return-statements",
     "--disable", "too-many-statements",
     "--disable", "undefined-variable",
     "--disable", "unidiomatic-typecheck",

@@ -67,7 +67,7 @@ class JailedGrader(Grader):
     and optionally codejail_python="python name" (the name that you used to configure codejail)
     """
     def __init__(self, *args, **kwargs):
-        self.codejail_python = kwargs.pop("codejail_python", "python")
+        self.codejail_python = kwargs.pop("codejail_python", "python3")
         super(JailedGrader, self).__init__(*args, **kwargs)
         self.locale_dir = self.grader_root / "conf" / "locale"
         self.fork_per_item = False  # it's probably safe not to fork

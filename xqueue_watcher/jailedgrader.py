@@ -133,7 +133,7 @@ class JailedGrader(Grader):
         answers = []
         try:
             answer_dir_files = os.listdir(os.path.dirname(grader_path))
-            answer_files = list(filter(lambda f: f.startswith('answer') and f.endswith('.py'), answer_dir_files))
+            answer_files = list(filter(lambda f: f.lower().startswith('answer') and f.endswith('.py'), answer_dir_files))
             answers = [Path(grader_path).dirname() + '/' + a for a in answer_files]
             print("Multiple answer files: " + str(answers))
         except Exception:

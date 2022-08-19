@@ -33,6 +33,7 @@ pylint:
     - arguments-renamed
     - bare-except
     - consider-using-f-string
+    - consider-using-with
     - deprecated-module
     - django-not-configured
     - import-error

@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
--e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail  # via -r requirements/base.txt
+EdX-CodeJail >= 3.2.0
 backports.os==0.1.1       # via -r requirements/base.txt, path.py
 certifi==2020.6.20        # via -r requirements/base.txt, requests
 chardet==3.0.4            # via -r requirements/base.txt, requests

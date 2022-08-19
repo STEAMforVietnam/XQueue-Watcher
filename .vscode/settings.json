@@ -2,6 +2,7 @@
   "editor.rulers": [79],
 
   "files.exclude": {
+    "**/*.egg-info": true,
     "**/.git": true,
     "**/.mypy_cache": true,
     "**/*.pyc": {"when": "$(basename).py"},
@@ -24,6 +25,7 @@
     "--disable", "broad-except",
     "--disable", "c-extension-no-member",
     "--disable", "consider-using-f-string",
+    "--disable", "consider-using-with",
     "--disable", "deprecated-module",
     "--disable", "fixme",
     "--disable", "import-error",

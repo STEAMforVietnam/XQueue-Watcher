@@ -1,7 +1,7 @@
 xqueue_watcher
 ==========
 
-This is an implementation of a polling [XQueue](https://github.com/edx/xqueue) client and grader.
+This is an implementation of a polling [XQueue](https://github.com/openedx/xqueue) client and grader.
 
 Overview
 ========
@@ -33,7 +33,7 @@ root/
 Running XQueue Watcher:
 ======================
 
-Usually you can run XQueue Watcher without making any changes. You should keep course-specific in another folder like shown above, so that you can update xqueue_watcher anytime.
+Usually you can run XQueue Watcher without making any changes. You should keep course-specific files in another folder like shown above, so that you can update xqueue_watcher anytime.
 
 Install the requirements before running `xqueue_watcher`
 ```bash
@@ -52,7 +52,7 @@ The course configuration JSON file in `conf.d` should have the following structu
         "test-123": {
             "SERVER": "http://127.0.0.1:18040",
             "CONNECTIONS": 1,
-            "AUTH": ["lms", "lms"],
+            "AUTH": ["uname", "pwd"],
             "HANDLERS": [
                 {
                     "HANDLER": "xqueue_watcher.grader.Grader",
@@ -67,7 +67,7 @@ The course configuration JSON file in `conf.d` should have the following structu
 
 * `test-123`: the name of the queue
 * `SERVER`: XQueue server address
-* `AUTH`: list of username, password
+* `AUTH`: List containing [username, password] of XQueue Django user
 * `CONNECTIONS`: how many threads to spawn to watch the queue
 * `HANDLERS`: list of callables that will be called for each queue submission
    * `HANDLER`: callable name, see below for Submissions Handler
@@ -79,10 +79,18 @@ The course configuration JSON file in `conf.d` should have the following structu
 Submissions Handler
 ===================
 
+<<<<<<< HEAD
 When xqueue_watcher detects any new submission, it will be passed to the submission handler for grading. It will instantiate a new handler based on the name configured above, with submission information retrieved
 from XQueue. There is a base grader defined in xqueue_watcher: Grader and JailedGrader (for Python, using CodeJail). If you don't use JailedGrader, you'd have to implement your own Grader by subclassing `xqueue_watcher.grader.Grader
 
 The payload from XQueue will be a JSON that usually looks like this, notice that "grader" is a required field in the "grader_payload" and must be configured accordingly in the Studio for the exercise.
+=======
+When `xqueue_watcher` detects any new submission, it will be passed to the submission handler for grading. It will instantiate a new handler based on the name configured above, with submission information retrieved
+from XQueue. Base graders are defined in `xqueue_watcher`: Grader and JailedGrader (for Python, using CodeJail). If you don't use JailedGrader, you'd have to implement your own Grader by subclassing `xqueue_watcher.grader.Grader`
+
+The payload received from XQueue will be a JSON object that usually looks like the JSON below. Note that "grader" is a required field in the "grader_payload" and must be configured accordingly in Studio.
+
+>>>>>>> 180d12060386e88b36f0bcdc12a2e4c77db2a49f
 ```json
 {
     "student_info": {
@@ -110,7 +118,7 @@ Note that `grader_path` is constructed by appending the relative path to the gra
 `xqueue_watcher` provides a few utilities for grading python submissions, including JailedGrader for running python code in a safe environment and grading support utilities.
 
 ### JailedGrader
-To sandbox python, use [CodeJail](https://github.com/edx/codejail). In your handler configuration, add:
+To sandbox python, use [CodeJail](https://github.com/openedx/codejail). In your handler configuration, add:
 ```json
     "HANDLER": "xqueue_watcher.jailedgrader.JailedGrader",
     "CODEJAIL": {
@@ -119,15 +127,15 @@ To sandbox python, use [CodeJail](https://github.com/edx/codejail). In your hand
         "user": "sandbox_username"
     }
 ```
-Then, `codejail_python` will automatically be added to the kwargs for your handler. You can then import codejail.jail_code and run `jail_code("python", code...)`. You can define multiple sandboxes and use them as in `jail_code("special-python", ...)`
+Then, `codejail_python` will automatically be added to the kwargs for your handler. You can then import codejail.jail_code and run `jail_code("python", code...)`. You can define multiple sandboxes and use them as in `jail_code("another-python-version", ...)`
 
-To use JailedGrader, you also need to provide an `answer.py` file on the same folder with the `grader.py` file. The grader will run both student submission and `answer.py` and compare the output with each other.
+To use JailedGrader, you also need to provide an `answer.py` file on the same folder with the `grader.py` file. `answer.py` contains the correct/reference implementation of the solution to the problem. The grader will run both student submission and `answer.py` and compare the output with each other.
 
 ### Grading Support utilities
 There are several grading support utilities that make writing `grader.py` for python code easy. Check out
 `grader_support/gradelib.py` for the documentation.
 
-- `grader_support.gradelib.Grader`: a base class for creating a new submission grader. Not to be confused with `xqueue-watcher.grader.Grader`. You can add input checks, preprocessors and tests to a grader object.
+- `grader_support.gradelib.Grader`: a base class for creating a new submission grader. Not to be confused with `xqueue-watcher.grader.Grader`. You can add input checks, preprocessors and tests to a Grader object.
 - `grader_support.gradelib.Test`: a base class for creating tests for a submission. Usually a submission can be graded with one or a few tests. There are also few useful test functions and classes included, like `InvokeStudentFunctionTest` , `exec_wrapped_code`, etc.
 - Preprocessors: utilities to process the raw submission before grading it. `wrap_in_string` is useful for testing code that is not wrapped in a function.
 - Input checks: sanity checks before running a submission, eg check `required_string` or `prohibited_string`

@@ -19,7 +19,6 @@ from grader_support.graderutil import LANGUAGE
 import grader_support
 
 from .grader import Grader
-from six.moves import zip
 
 TIMEOUT = 1
 
@@ -67,8 +66,8 @@ class JailedGrader(Grader):
     and optionally codejail_python="python name" (the name that you used to configure codejail)
     """
     def __init__(self, *args, **kwargs):
-        self.codejail_python = kwargs.pop("codejail_python", "python3")
-        super(JailedGrader, self).__init__(*args, **kwargs)
+        self.codejail_python = kwargs.pop("codejail_python", "python")
+        super().__init__(*args, **kwargs)
         self.locale_dir = self.grader_root / "conf" / "locale"
         self.fork_per_item = False  # it's probably safe not to fork
         # EDUCATOR-3368: OpenBLAS library is allowed to allocate 1 thread
@@ -98,7 +97,7 @@ class JailedGrader(Grader):
             return f.read().decode('utf-8')
 
     def grade(self, grader_path, grader_config, submission):
-        if type(submission) != six.text_type:
+        if type(submission) != str:
             self.log.warning("Submission is NOT unicode")
 
         results = {
@@ -149,7 +148,7 @@ class JailedGrader(Grader):
         # Import the grader, straight from the original file.  (It probably isn't in
         # sys.path, and we may be in a long running gunicorn process, so we don't
         # want to add stuff to sys.path either.)
-        grader_module = imp.load_source("grader_module", six.text_type(grader_path))
+        grader_module = imp.load_source("grader_module", str(grader_path))
         grader = grader_module.grader
 
         # Preprocess for grader-specified errors

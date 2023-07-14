@@ -13,10 +13,9 @@ import time
 from codejail import jail_code
 
 from .settings import get_manager_config_values, MANAGER_CONFIG_DEFAULTS
-from six.moves import range
 
 
-class Manager(object):
+class Manager:
     """
     Manages polling connections to XQueue.
     """
@@ -122,8 +121,8 @@ class Manager(object):
         user = codejail_config.get('user', getpass.getuser())
         jail_code.configure(name, bin_path, user=user)
         limits = codejail_config.get("limits", {})
-        for name, value in limits.items():
-            jail_code.set_limit(name, value)
+        for limit_name, value in limits.items():
+            jail_code.set_limit(limit_name, value)
         self.log.info("configured codejail -> %s %s %s", name, bin_path, user)
         return name
 

@@ -3,9 +3,9 @@ import inspect
 import random
 import re
 import sys
-import tokenize
+from tokenize import tokenize, COMMENT, STRING
+from io import BytesIO, StringIO
 
-import six
 # the run library should overwrite this with a particular random seed for the test.
 rand = random.Random(1)
 
@@ -18,7 +18,7 @@ class EndTest(Exception):
         Exception.__init__(self, message)
 
 
-class Test(object):
+class Test:
     """
     A simple class to wrap a test function and its descriptions.
 
@@ -53,7 +53,7 @@ class Test(object):
         return expected == actual
 
 
-class Grader(object):
+class Grader:
     def __init__(self):
         """
         Create an empty grader.
@@ -247,11 +247,7 @@ def _tokens(code):
     A wrapper around tokenize.generate_tokens.
     """
     # Protect against pathological inputs: http://bugs.python.org/issue16152
-    code = code.rstrip() + "\n"
-    if isinstance(code, six.text_type):
-        code = code.encode('utf8')
-    code = "# coding: utf8\n" + code
-    toks = tokenize.generate_tokens(six.BytesIO(code).readline)
+    toks = tokenize(BytesIO(code.encode('utf-8')).readline)
     return toks
 
 def _count_tokens(code, string):
@@ -262,7 +258,7 @@ def _count_tokens(code, string):
 
     try:
         for ttyp, ttok, __, __, __ in _tokens(code):
-            if ttyp in (tokenize.COMMENT, tokenize.STRING):
+            if ttyp in (COMMENT, STRING):
                 continue
             if ttok == string:
                 count += 1
@@ -362,7 +358,7 @@ def count_non_comment_lines(at_least=None, at_most=None, exactly=None, error_msg
     def check(code):
         linenums = set()
         for ttyp, ttok, (srow, __), __, __ in _tokens(code):
-            if ttyp in (tokenize.COMMENT, tokenize.STRING):
+            if ttyp in (COMMENT, STRING):
                 # Comments and strings don't count toward line count. If a string
                 # is the only thing on a line, then it's probably a docstring, so
                 # don't count it.
@@ -475,7 +471,7 @@ def required_class_method(class_name, method_name, error_msg=None):
 @contextlib.contextmanager
 def capture_stdout():
     old_stdout = sys.stdout
-    sys.stdout = stdout = six.StringIO()
+    sys.stdout = stdout = StringIO()
     yield stdout
     sys.stdout = old_stdout
 
@@ -490,7 +486,7 @@ def exec_wrapped_code(environment=None, post_process=None):
         environment = {}
     def test_fn(submission_module):
         with capture_stdout() as stdout:
-            six.exec_(submission_module.submission_code, environment)
+            exec(submission_module.submission_code, environment)
         stdout_text = stdout.getvalue()
         if post_process:
             stdout_text = post_process(stdout_text)
@@ -512,7 +508,7 @@ def exec_code_and_inspect_values(environment=None, vars_to_inspect=None, post_pr
         environment = {}
     def test_fn(submission_module):
         with capture_stdout() as stdout:
-            six.exec_(submission_module.submission_code, environment)
+            exec(submission_module.submission_code, environment)
 
         for var in vars_to_inspect:
             print(var)
@@ -539,7 +535,7 @@ def invoke_student_function(fn_name, args, environment=None, output_writer=None)
     """
     output_writer = output_writer or repr
     def doit(submission_module):
-        for name, value in six.iteritems(environment or {}):
+        for name, value in (environment or {}).items():
             setattr(submission_module, name, value)
         fn = getattr(submission_module, fn_name)
         print(output_writer(fn(*args)))
@@ -552,19 +548,19 @@ class InvokeStudentFunctionTest(Test):
     def __init__(self, fn_name, args, environment=None, output_writer=None, short_desc=None, detailed_desc=None, compare=None):
         test_fn = invoke_student_function(fn_name, args, environment, output_writer)
         if short_desc is None:
-            short_desc = "Test: %s(%s)" % (fn_name, ", ".join(repr(a) for a in args))
+            short_desc = "Test: {}({})".format(fn_name, ", ".join(repr(a) for a in args))
         Test.__init__(self, test_fn, short_desc, detailed_desc, compare)
 
 class ExecWrappedStudentCodeTest(Test):
     """
-    A Test that exec student code and capture the stdout result.
+    A Test that executes the student code and captures the result, which is output to stdout.
     The code must be preprocessed with `wrap_in_string`
     """
     def __init__(self, environment=None, short_desc=None, detailed_desc=None, compare=None):
         test_fn = exec_wrapped_code(environment)
         if short_desc is None:
             short_desc = "Test: %s(%s)" % (fn_name, ", ".join(repr(a) for a in args))
-        Test.__init__(self, test_fn, short_desc, detailed_desc, compare)
+        gradelib.Test.__init__(self, test_fn, short_desc, detailed_desc, compare)
 
 def round_float_writer(n):
     """

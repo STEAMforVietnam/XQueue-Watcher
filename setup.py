@@ -1,5 +1,6 @@
 from setuptools import setup
 
+
 setup(
     name='xqueue_watcher',
     version='0.2',
@@ -8,5 +9,6 @@ setup(
         'grader_support',
         'xqueue_watcher',
     ],
-    install_requires=open('requirements/production.txt', 'r').readlines()
+    install_requires=open('requirements/production.txt',
+                          'rt', encoding='utf-8').readlines(),
 )

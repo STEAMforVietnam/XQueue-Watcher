@@ -1,7 +1,7 @@
 import unittest
 from path import Path
 import json
-from mock import Mock
+from unittest.mock import Mock
 import time
 import sys
 
@@ -9,7 +9,7 @@ import logging
 from xqueue_watcher import manager
 from tests.test_xqueue_client import MockXQueueServer
 
-from six import StringIO
+from io import StringIO
 
 try:
     import codejail
@@ -67,7 +67,8 @@ class ManagerTests(unittest.TestCase):
                 "VMEM": 1024
             }
         }
-        self.m.enable_codejail(config)
+        codejail_return = self.m.enable_codejail(config)
+        self.assertEqual(codejail_return, config["name"])
         self.assertTrue(codejail.jail_code.is_configured("python"))
         self.m.enable_codejail({
             "name": "other-python",

@@ -79,11 +79,18 @@ The course configuration JSON file in `conf.d` should have the following structu
 Submissions Handler
 ===================
 
+<<<<<<< HEAD
+When xqueue_watcher detects any new submission, it will be passed to the submission handler for grading. It will instantiate a new handler based on the name configured above, with submission information retrieved
+from XQueue. There is a base grader defined in xqueue_watcher: Grader and JailedGrader (for Python, using CodeJail). If you don't use JailedGrader, you'd have to implement your own Grader by subclassing `xqueue_watcher.grader.Grader
+
+The payload from XQueue will be a JSON that usually looks like this, notice that "grader" is a required field in the "grader_payload" and must be configured accordingly in the Studio for the exercise.
+=======
 When `xqueue_watcher` detects any new submission, it will be passed to the submission handler for grading. It will instantiate a new handler based on the name configured above, with submission information retrieved
 from XQueue. Base graders are defined in `xqueue_watcher`: Grader and JailedGrader (for Python, using CodeJail). If you don't use JailedGrader, you'd have to implement your own Grader by subclassing `xqueue_watcher.grader.Grader`
 
 The payload received from XQueue will be a JSON object that usually looks like the JSON below. Note that "grader" is a required field in the "grader_payload" and must be configured accordingly in Studio.
 
+>>>>>>> 180d12060386e88b36f0bcdc12a2e4c77db2a49f
 ```json
 {
     "student_info": {

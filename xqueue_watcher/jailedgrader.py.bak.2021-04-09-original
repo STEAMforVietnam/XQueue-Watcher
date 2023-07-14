@@ -10,7 +10,6 @@ import random
 import gettext
 from path import Path
 import six
-import traceback
 
 import codejail
 
@@ -19,6 +18,7 @@ from grader_support.graderutil import LANGUAGE
 import grader_support
 
 from .grader import Grader
+from six.moves import zip
 
 TIMEOUT = 1
 
@@ -67,7 +67,7 @@ class JailedGrader(Grader):
     """
     def __init__(self, *args, **kwargs):
         self.codejail_python = kwargs.pop("codejail_python", "python")
-        super().__init__(*args, **kwargs)
+        super(JailedGrader, self).__init__(*args, **kwargs)
         self.locale_dir = self.grader_root / "conf" / "locale"
         self.fork_per_item = False  # it's probably safe not to fork
         # EDUCATOR-3368: OpenBLAS library is allowed to allocate 1 thread
@@ -91,13 +91,8 @@ class JailedGrader(Grader):
         print("result", r.status, r.stdout, r.stderr)
         return r
 
-    def read_answer_file(self, answer_path):
-        print("answer path", answer_path)
-        with open(answer_path, 'rb') as f:
-            return f.read().decode('utf-8')
-
     def grade(self, grader_path, grader_config, submission):
-        if type(submission) != str:
+        if type(submission) != six.text_type:
             self.log.warning("Submission is NOT unicode")
 
         results = {
@@ -129,26 +124,15 @@ class JailedGrader(Grader):
         print("__DEBUG__")
         print("grader path", grader_path)
 
-        answers = []
-        try:
-            answer_dir_files = os.listdir(os.path.dirname(grader_path))
-            answer_files = list(filter(lambda f: f.lower().startswith('answer') and f.endswith('.py'), answer_dir_files))
-            answers = [Path(grader_path).dirname() + '/' + a for a in answer_files]
-            print("Multiple answer files: " + str(answers))
-        except Exception:
-            print(traceback.format_exc())
-            answers = [Path(grader_path).dirname() + '/answer.py']
-
-        read_answer_files = [self.read_answer_file(f) for f in answers]
-        #answer_path = Path(grader_path).dirname() / 'answer.py'
-        #print("answer path", answer_path)
-        #with open(answer_path, 'rb') as f:
-            #answer = f.read().decode('utf-8')
+        answer_path = Path(grader_path).dirname() / 'answer.py'
+        print("answer path", answer_path)
+        with open(answer_path, 'rb') as f:
+            answer = f.read().decode('utf-8')
 
         # Import the grader, straight from the original file.  (It probably isn't in
         # sys.path, and we may be in a long running gunicorn process, so we don't
         # want to add stuff to sys.path either.)
-        grader_module = imp.load_source("grader_module", str(grader_path))
+        grader_module = imp.load_source("grader_module", six.text_type(grader_path))
         grader = grader_module.grader
 
         # Preprocess for grader-specified errors
@@ -158,20 +142,11 @@ class JailedGrader(Grader):
             # Don't run tests if there were errors
             return results
 
-        if grader.only_check_input():
-            results['correct'] = True
-            results['score'] = 1
-            self.log.debug('Only checking inputs, returning correct.')
-            return results
-
         # Add a unicode encoding declaration.
-        #processed_answer = prepend_coding(grader.preprocess(answer))
-        processed_answers = [prepend_coding(grader.preprocess(a)) for a in read_answer_files]
+        processed_answer = prepend_coding(grader.preprocess(answer))
         processed_submission = prepend_coding(grader.preprocess(submission))
 
-        #print("processed answer", processed_answer)
-        for a in processed_answers:
-            print("processed answer", a)
+        print("processed answer", processed_answer)
         print("processed_submission", processed_submission)
 
         # Same seed for both runs
@@ -180,19 +155,14 @@ class JailedGrader(Grader):
         # Run the official answer, to get the expected output.
         expected_ok = False
         expected_exc = None
-        expected_solutions = []
         try:
             # If we want a factor of two speedup for now: trust the staff solution to
             # avoid hitting the sandbox. (change run to run_trusted)
             expected_outputs = None  # in case run_trusted raises an exception.
-            #expected_outputs = self._run(grader_path, processed_answer, seed).stdout
-            expected_outputs = [self._run(grader_path, a, seed).stdout for a in processed_answers]
+            expected_outputs = self._run(grader_path, processed_answer, seed).stdout
             print("expected_outputs", expected_outputs)
             if expected_outputs:
-                for o in expected_outputs:
-                    if o:
-                        expected = json.loads(o.decode('utf-8'))
-                        expected_solutions.append(expected)
+                expected = json.loads(expected_outputs.decode('utf-8'))
                 expected_ok = True
         except Exception:
             expected_exc = sys.exc_info()
@@ -248,63 +218,42 @@ class JailedGrader(Grader):
         # Compare actual and expected through the grader tests, but only if we haven't
         # already found a problem.
         corrects = []
-        tests_dont_match_up = []
         if not results['errors']:
-            is_num_results_diff = True
-            for expected in expected_solutions:
-                expected_results = expected['results']
-                actual_results = actual['results']
-                if len(expected_results) == len(actual_results):
-                    is_num_results_diff = False
-                    break
-            if is_num_results_diff:
+            expected_results = expected['results']
+            actual_results = actual['results']
+            if len(expected_results) != len(actual_results):
                 results['errors'].append(_('Something went wrong: different numbers of '
                                          'tests ran for your code and for our reference code.'))
                 return results
 
-            final_results = results
-            for expected in expected_solutions:
-                corrects = []
-                results = final_results
-                expected_results = expected['results']
-                actual_results = actual['results']
-                for test, exp, act in zip(grader.tests(), expected_results, actual_results):
-                    exp_short_desc, exp_long_desc, exp_output = exp
-                    act_short_desc, act_long_desc, act_output = act
-                    tests_dont_match_up.append(exp_short_desc != act_short_desc)
-                    if exp_short_desc != act_short_desc:
-                        #results['errors'].append(_("Something went wrong: tests don't match up."))
-                        # TODO: don't give up so easily?
-                        #return results
-                        # Jump to next solution, no need to compare results here
-                        next
-                    # Truncate here--we don't want to send long output back, and also don't want to
-                    # confuse students by comparing the full output but sending back truncated output.
-                    act_output = truncate(act_output)
-                    try:
-                        correct = test.compare_results(exp_output, act_output)
-                    except EndTest as e:
-                        # Allows a grader's compare_results function to raise an EndTest exception
-                        # (defined in gradelib.py). This enables the checker to print out an error
-                        # message to the student, which will be appended to the end of stdout.
-                        if e is not None:
-                            act_output += '\n'
-                            error_msg = _("ERROR")
-                            act_output += "*** {error_msg}: {error_detail} ***".format(
-                                error_msg=error_msg,
-                                error_detail=e
-                            )
-                        correct = False
-                    corrects.append(correct)
-                    if not grader_config.get("hide_output", False):
-                        results['tests'].append((exp_short_desc, exp_long_desc,
-                                                correct, exp_output, act_output))
-                if len(corrects) > 0 and all(corrects):
-                    break # This solution works, short-circuit here
-        # All solutions ran into "tests don't match up" problem
-        if all(tests_dont_match_up):
-            results['errors'].append(_("Something went wrong: tests don't match up."))
-            return results
+            for test, exp, act in zip(grader.tests(), expected_results, actual_results):
+                exp_short_desc, exp_long_desc, exp_output = exp
+                act_short_desc, act_long_desc, act_output = act
+                if exp_short_desc != act_short_desc:
+                    results['errors'].append(_("Something went wrong: tests don't match up."))
+                    # TODO: don't give up so easily?
+                    return results
+                # Truncate here--we don't want to send long output back, and also don't want to
+                # confuse students by comparing the full output but sending back truncated output.
+                act_output = truncate(act_output)
+                try:
+                    correct = test.compare_results(exp_output, act_output)
+                except EndTest as e:
+                    # Allows a grader's compare_results function to raise an EndTest exception
+                    # (defined in gradelib.py). This enables the checker to print out an error
+                    # message to the student, which will be appended to the end of stdout.
+                    if e is not None:
+                        act_output += '\n'
+                        error_msg = _("ERROR")
+                        act_output += "*** {error_msg}: {error_detail} ***".format(
+                            error_msg=error_msg,
+                            error_detail=e
+                        )
+                    correct = False
+                corrects.append(correct)
+                if not grader_config.get("hide_output", False):
+                    results['tests'].append((exp_short_desc, exp_long_desc,
+                                            correct, exp_output, act_output))
 
         # If there were no tests run, then there was probably an error, so it's incorrect
         n = len(corrects)
@@ -336,16 +285,15 @@ def main(args):     # pragma: no cover
     if len(args) != 2:
         return
 
-    configure('python3', sys.executable, user=getpass.getuser())
+    configure("python", sys.executable, user=getpass.getuser())
     (grader_path, submission_path) = args
 
     with open(submission_path) as f:
-        submission = f.read()   # .decode('utf-8')
+        submission = f.read().decode('utf-8')
 
     grader_config = {"lang": "eo"}
-    grader_path = Path(grader_path).abspath()
-    g = JailedGrader(grader_root=grader_path.dirname().parent.parent,
-                     codejail_python='python3')
+    grader_path = path(grader_path).abspath()
+    g = JailedGrader(grader_root=grader_path.dirname().parent.parent)
     pprint(g.grade(grader_path, grader_config, submission))
 
 

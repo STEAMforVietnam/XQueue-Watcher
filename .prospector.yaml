@@ -1,0 +1,62 @@
+mccabe:
+  disable:
+    - MC0001
+
+pep8:
+  disable:
+    - E305
+    - E306
+    - E115
+    - E116
+    - E501
+    - E722
+    - E741
+
+pycodestyle:
+  disable:
+    - E115
+    - E116
+    - E305
+    - E306
+    - E501
+    - E722
+    - E741
+
+pyflakes:
+  disable:
+    - F401
+    - F821
+    - F841
+
+pylint:
+  disable:
+    - arguments-renamed
+    - bare-except
+    - consider-using-f-string
+    - consider-using-with
+    - deprecated-module
+    - django-not-configured
+    - import-error
+    - import-outside-toplevel
+    - inconsistent-return-statements
+    - line-too-long
+    - logging-format-interpolation
+    - logging-not-lazy
+    - method-hidden
+    - multiple-imports
+    - no-else-raise
+    - no-else-return
+    - pointless-statement
+    - super-with-arguments
+    - too-many-arguments
+    - too-many-branches
+    - too-many-locals
+    - too-many-statements
+    - undefined-variable
+    - unidiomatic-typecheck
+    - unused-argument
+    - unused-import
+    - unused-variable
+    - unspecified-encoding
+    - useless-object-inheritance
+    - useless-suppression

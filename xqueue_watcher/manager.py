@@ -69,7 +69,9 @@ class Manager:
         """
         Configure XQueue clients.
         """
+        print(configuration)
         for queue_name, config in configuration.items():
+            print(config)
             for i in range(config.get('CONNECTIONS', 1)):
                 watcher = self.client_from_config(queue_name, config)
                 self.clients.append(watcher)

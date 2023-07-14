@@ -1,0 +1,91 @@
+{
+  "editor.rulers": [79],
+
+  "files.exclude": {
+    "**/*.egg-info": true,
+    "**/.git": true,
+    "**/.mypy_cache": true,
+    "**/*.pyc": {"when": "$(basename).py"},
+    "**/__pycache__": true,
+    "**/.ropeproject": true
+  },
+
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingImports" : "none",
+    "reportMissingModuleSource" : "none",
+    "reportUndefinedVariable" : "none"
+  },
+
+  "python.linting.enabled": true,
+
+  "python.linting.pylintEnabled": true,
+  "python.linting.pylintArgs": [
+    "--disable", "arguments-renamed",
+    "--disable", "bare-except",
+    "--disable", "broad-except",
+    "--disable", "c-extension-no-member",
+    "--disable", "consider-using-f-string",
+    "--disable", "consider-using-with",
+    "--disable", "deprecated-module",
+    "--disable", "fixme",
+    "--disable", "import-error",
+    "--disable", "import-outside-toplevel",
+    "--disable", "inconsistent-return-statements",
+    "--disable", "invalid-name",
+    "--disable", "line-too-long",
+    "--disable", "logging-format-interpolation",
+    "--disable", "logging-not-lazy",
+    "--disable", "method-hidden",
+    "--disable", "missing-class-docstring",
+    "--disable", "missing-function-docstring",
+    "--disable", "missing-module-docstring",
+    "--disable", "multiple-imports",
+    "--disable", "no-else-raise",
+    "--disable", "no-else-return",
+    "--disable", "no-self-use",
+    "--disable", "pointless-statement",
+    "--disable", "super-with-arguments",
+    "--disable", "too-few-public-methods",
+    "--disable", "too-many-arguments",
+    "--disable", "too-many-branches",
+    "--disable", "too-many-instance-attributes",
+    "--disable", "too-many-locals",
+    "--disable", "too-many-return-statements",
+    "--disable", "too-many-statements",
+    "--disable", "undefined-variable",
+    "--disable", "unidiomatic-typecheck",
+    "--disable", "unnecessary-pass",
+    "--disable", "unspecified-encoding",
+    "--disable", "unused-argument",
+    "--disable", "unused-import",
+    "--disable", "unused-variable",
+    "--disable", "useless-object-inheritance",
+    "--disable", "wrong-import-order"
+  ],
+
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": [
+    "--ignore=E115,E116,E123,E128,E226,E231,E261,E265,E266,E302,E303,E305,E306,E401,E501,E722,E741,F401,F821,F841,N806"
+  ],
+
+  "python.linting.mypyEnabled": false,
+
+  "python.linting.pydocstyleEnabled": false,
+
+  "python.linting.pycodestyleEnabled": true,
+  "python.linting.pycodestyleArgs": [
+    "--ignore=E115,E116,E123,E128,E226,E261,E265,E231,E266,E302,E303,E305,E306,E401,E501,E722,E741"
+  ],
+
+  "python.linting.prospectorEnabled": true,
+
+  "python.linting.pylamaEnabled": true,
+  "python.linting.pylamaArgs": [
+    "--ignore=C901,E115,E116,E123,E128,E226,E231,E261,E265,E266,E302,E303,E305,E306,E401,E501,E0602,E722,E741,W0611,W0612"
+  ],
+
+  "python.linting.banditEnabled": true,
+  "python.linting.banditArgs": [
+    "--skip=B103,B108,B110,B311"
+  ]
+}

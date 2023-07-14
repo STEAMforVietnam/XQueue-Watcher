@@ -69,6 +69,9 @@ class Grader:
         # list of functions: submission_text -> error text or None
         self._input_checks = []
 
+        # Flag: Do not run, just check input
+        self._only_check_input = False
+
         # list of functions: submission_text -> processed_submission_text.  Run
         # in the specified order.  (foldl)
         self._preprocessors = [fix_line_endings]
@@ -87,6 +90,12 @@ class Grader:
         MUST NOT RUN the submission.  Only allowed to do safe checks, like substr, etc.
         """
         return [_f for _f in [check(submission_str) for check in self._input_checks] if _f]
+
+    def only_check_input(self):
+        return self._only_check_input
+
+    def set_only_check_input(self, value):
+        self._only_check_input = value
 
     def preprocess(self, submission_str):
         """
